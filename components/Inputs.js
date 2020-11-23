@@ -9,6 +9,32 @@ class Inputs extends Component {
     onFocusChange = () => {
         this.setState({isFocused: true})
     }
+     onTextChange = (text) => {
+      switch (this.props.name) {
+          case "FullName":
+                this.props.FullName(text);
+              break;
+          case "Email":
+                this.props.Email(text);
+              break;
+          case "Phone":
+                this.props.Phone(text);
+              break;
+      
+          case "Password":
+                this.props.Password(text);
+              break;
+      
+          case "Confirm_Password":
+                this.props.Confirm_Password(text);
+              break;
+      
+          default:
+              break;
+      }
+     
+    }
+
 
     render() {
         return(
@@ -18,6 +44,7 @@ class Inputs extends Component {
                     onFocus={this.onFocusChange}
                     inputContainerStyle={styles.inputContainer}
                     inputStyle={styles.inputText}
+                    onChangeText={value=>  this.onTextChange(value)}
                     secureTextEntry={this.props.pass}
                     rightIcon= {
                         <Icon 
