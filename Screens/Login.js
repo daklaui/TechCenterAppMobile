@@ -1,116 +1,79 @@
-import React, { Component } from 'react';
-import { View, StyleSheet, Text, Image, ScrollView, Button } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, Text, Image, ScrollView, Button, AsyncStorage } from 'react-native';
 import Inputs from '../components/Inputs';
 import Submit from '../components/Submit';
-import {isEmail,isValidationPassword,isEmpty}from '../Validator/validator'
 import { loginEtudiant } from '../Service/EtudiantService';
+const Login = (props) => {
 
+    const [login, setLogin] = useState("");
+    const [password, setPassword] = useState("");
+    const [loginError, setLoginError] = useState(false);
+    const [passwordError, setPasswordError] = useState(false);
+    const [loginErrorClick, setLoginErrorClick] = useState(true);
+    const [passwordErrorClick, setPasswordErrorClick] = useState(true);
 
-class Login extends Component {
-
-
-
-    validateEmail = email => {
-        var re = /^(([^<>()\[\]\\.,;:\s@”]+(\.[^<>()\[\]\\.,;:\s@”]+)*)|(“.+”))@((\[[0–9]{1,3}\.[0–9]{1,3}\.[0–9]{1,3}\.[0–9]{1,3}])|(([a-zA-Z\-0–9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(email);
-        };
-
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            Email: '',
-            Password: ''
+const  SetToken=async (text)=>{
+    await  AsyncStorage.setItem("isLoggedIn",text).then( ()=>{
+        console.log("It was saved successfully")
+        } )
+        .catch( ()=>{
+        console.log("There was an error saving the product")
+        } );
+}
+    const submit = () => {
+        if (login == "") {
+            setLoginError(true);
         }
-    }
-
-
-    /**
-     * 
-     *  fetch('url?email=a@gmail.com&password=a@gmail.com', {
-             method: 'POST'
-          })
-          .then((response) => response.json())
-          .then((responseJson) => {
-             console.log(responseJson);
-             // this.setState({
-             //    data: responseJson
-             // })
-          })
-          .catch((error) => {
-             console.error(error);
-          });
-     * 
-     * 
-     */
-
-    submit() {
-        if (!this.validateEmail(this.state.Email)) {
-            alert('Invalid email.')
-            }
-            else if (isEmpty(this.state.Password)) {
-                alert('Invalid Password.')
+        else {
+            setLoginError(false);
+        }
+        if (password == "") {
+            setPasswordError(true);
+        }
+        else {
+            setPasswordError(false);
+        }
+        if (!loginError && !passwordError && !loginErrorClick && !passwordErrorClick) {
+            loginEtudiant(login, password).then((response) => {
+                if (response.status == 200 && (response.data != null || response.data != "")) {
+                     if(response.data.type=="etudiant")
+                     {
+                        SetToken(JSON.stringify(response.data));
+                       props.navigation.navigate('Home')
+                     }
+                     else
+                     {
+                          SetToken(JSON.stringify(response.data));
+                       props.navigation.navigate('Profile') 
+                     }
+                }else{
+                    alert("email or password is incorrect");
                 }
-else
-{
-    loginEtudiant(this.state.Email, this.state.Password).then((response) => {
-        if (response.status == 200) {
-           if( response.data=="")
-           {
-            alert('Invalid email or Password.')
-           }
-           else
-           {
-               if(response.data=="formateur")
-               {
-                this.props.navigation.navigate('Profile')  
-               }
-               else
-               {
-                this.props.navigation.navigate('Home')
-               }
 
-               
-           }
-            //this.alertShow();
+
+            })
         }
-    });
-}
-
-
-        
     }
 
-    render() {
-        return (
-            <ScrollView style={{ backgroundColor: 'white' }}>
-                <View style={styles.container}>
-                    <Image
-                        source={require('../assets/Images/logo.png')}
-                        resizeMode="center"
-                        style={styles.image} />
-                    <Inputs name="Email" icon="user" Email={(value) => this.setState({ Email: value })} />
-               
-                    <Inputs name="Password" icon="lock" pass={true} Password={(value) => this.setState({ Password: value })} />
-                    <View style={{ width: '90%', marginTop: 10, marginBottom: 10 }}>
-                        <Text style={[styles.textBody], { alignSelf: 'flex-end' }}>Forgot Password?</Text>
-                    </View>
 
-                    <View style={styles.containerBtn}>
-                        <Button style={styles.btnsubmit} color="#253575" title="Login" onPress={() => { this.submit() }} />
-                    </View>
+    return (
+        <ScrollView style={{ backgroundColor: 'white' }}>
+            <View style={styles.container}>
+                <Image
+                    source={require('../assets/Images/logo.png')}
+                    resizeMode="center"
+                    style={styles.image} />
+                <Inputs name="Email" icon="user" Email={(value) => setLogin(value)} Error={loginError} ErroFromInput={(value) => { setLoginErrorClick(value) }} />
+                <Inputs name="Password" icon="lock" pass={true} Password={(value) => setPassword(value)} Error={passwordError} ErroFromInput={(value) => { setPasswordErrorClick(value) }} />
 
+                <Submit title="Sign in" color="#253575" submit={submit} />
 
-                    <View style={{ flexDirection: 'row', marginVertical: 5 }}>
-                        <Text style={styles.textBody}>Don't Have an account ?</Text>
-                        <Text style={[styles.textBody, { color: 'blue' }]} onPress={() => props.navigation.navigate('SignUp')}> Sign Up</Text>
-                    </View>
-                </View>
-            </ScrollView>
-        )
-    }
+            </View>
+        </ScrollView>
+    );
 }
-export default Login;
+
+export default Login
 
 const styles = StyleSheet.create({
     container: {
@@ -133,8 +96,15 @@ const styles = StyleSheet.create({
         fontFamily: 'Foundation',
         fontSize: 16
     },
+    textErrors: {
+
+        fontSize: 16,
+        color: '#f00',
+
+    },
     btnsubmit: {
-        fontSize: 22,
+        fontSize: 40,
+        height: 500,
         fontWeight: 'bold',
         color: 'white',
         alignSelf: 'center',
@@ -142,11 +112,10 @@ const styles = StyleSheet.create({
     },
     containerBtn: {
         width: '90%',
-        height: 50,
+        height: 100,
         borderColor: 'blue',
         borderRadius: 10,
         marginVertical: 10,
-        borderWidth: 0,
+        borderWidth: 2.5,
     }
 });
-

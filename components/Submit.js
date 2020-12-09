@@ -3,8 +3,15 @@ import {View, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import {Button} from 'react-native-elements';
 
 const Submit = props => {
+   const onPressBtn=()=>{
+       if(props.submit)
+       {
+        props.submit();
+       }
+
+   }
     return (
-        <TouchableOpacity style={[styles.container, {backgroundColor: props.color}]}>
+        <TouchableOpacity  disabled={props.disabled} style={[styles.container, {backgroundColor: props.color}]} onPress={onPressBtn}>
             <Text style={styles.submitText}>{props.title}</Text>
         </TouchableOpacity>
     );

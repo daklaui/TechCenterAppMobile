@@ -1,35 +1,48 @@
 import React, { Component } from 'react';
 import {
   View, StyleSheet, Text, Image, ScrollView, TextInput, FlatList,
-  Keyboard
+  Keyboard,
+  AsyncStorage
 } from 'react-native';
 import Inputs from '../components/Inputs';
 import Submit from '../components/Submit';
 import Constants from 'expo-constants';
-import {listeFormations,listeFormationsBySearchMot} from '../Service/FormationService';
+import { listeFormations, listeFormationsBySearchMot } from '../Service/FormationService';
 import Icon from 'react-native-vector-icons/Ionicons'
 
-const listItems = ['Development', 'Business', 'IT & Software', 'Office Productivity', 'Personal Development', 'Design', 'Marketing', 'LifeStyle', 'Photography', 'Health & Fitness', 'Teacher Training', 'Music']
-
+//const listItems = ['Development', 'Business', 'IT & Software', 'Office Productivity', 'Personal Development', 'Design', 'Marketing', 'LifeStyle', 'Photography', 'Health & Fitness', 'Teacher Training', 'Music']
+const listItems = [{ image: "https://sokeo.fr/wp-content/uploads/2020/01/chris-ried-ieic5Tq8YMk-unsplash1-768x513.jpg", Titre: "Office Productivity", Description: "Office Productivity" },
+{ image: "https://sokeo.fr/wp-content/uploads/2020/01/chris-ried-ieic5Tq8YMk-unsplash1-768x513.jpg", Titre: "Photography", Description: "LifeStyle" },
+{ image: "https://sokeo.fr/wp-content/uploads/2020/01/chris-ried-ieic5Tq8YMk-unsplash1-768x513.jpg", Titre: "Marketing", Description: "LifeStyle" },
+{ image: "https://sokeo.fr/wp-content/uploads/2020/01/chris-ried-ieic5Tq8YMk-unsplash1-768x513.jpg", Titre: "Design", Description: "LifeStyle" },
+{ image: "https://sokeo.fr/wp-content/uploads/2020/01/chris-ried-ieic5Tq8YMk-unsplash1-768x513.jpg", Titre: "Personal Development", Description: "LifeStyle" },
+{ image: "https://sokeo.fr/wp-content/uploads/2020/01/chris-ried-ieic5Tq8YMk-unsplash1-768x513.jpg", Titre: "Development", Description: "LifeStyle" },
+{ image: "https://sokeo.fr/wp-content/uploads/2020/01/chris-ried-ieic5Tq8YMk-unsplash1-768x513.jpg", Titre: "Health & Fitness", Description: "LifeStyle" },
+{ image: "https://sokeo.fr/wp-content/uploads/2020/01/chris-ried-ieic5Tq8YMk-unsplash1-768x513.jpg", Titre: "LifeStyle", Description: "LifeStyle" },
+{ image: "https://sokeo.fr/wp-content/uploads/2020/01/chris-ried-ieic5Tq8YMk-unsplash1-768x513.jpg", Titre: "LifeStyle", Description: "LifeStyle" },
+{ image: "https://sokeo.fr/wp-content/uploads/2020/01/chris-ried-ieic5Tq8YMk-unsplash1-768x513.jpg", Titre: "LifeStyle", Description: "LifeStyle" },
+{ image: "https://sokeo.fr/wp-content/uploads/2020/01/chris-ried-ieic5Tq8YMk-unsplash1-768x513.jpg", Titre: "LifeStyle", Description: "LifeStyle" },
+{ image: "https://sokeo.fr/wp-content/uploads/2020/01/chris-ried-ieic5Tq8YMk-unsplash1-768x513.jpg", Titre: "LifeStyle", Description: "LifeStyle" }
+]
 
 class Home extends Component {
 
 
-constructor(props)
-{
-  super(props);
-this.state= {
-  searchBarFocused: false,
- value:'',
- listeDesFormations:[{}]
-}
+  constructor(props) {
+    super(props);
+   
+    this.state = {
+      searchBarFocused: false,
+      value: '',
+      listeDesFormations: [{}]
+    }
 
-listeFormations().then((response) => {
-          this.setState({listeDesFormations: response.data});
-      });
+    listeFormations().then((response) => {
+      this.setState({ listeDesFormations: response.data });
+    });
 
-console.log(this.state.listeDesFormations);
-}
+    console.log(this.state.listeDesFormations);
+  }
 
 
 
@@ -48,7 +61,12 @@ console.log(this.state.listeDesFormations);
   keyboardWillHide = () => {
     this.setState({ searchBarFocused: false })
   }
+  async getToken() {
+    console.log("resp="+await AsyncStorage.getItem("isLoggedIn"));
+  
+  }
   componentDidMount() {
+    this.getToken();
     this.keyboardDidShow = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow)
     this.keyboardWillShow = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow)
     this.keyboardWillHide = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide)
@@ -56,23 +74,20 @@ console.log(this.state.listeDesFormations);
 
   }
 
-onChangeText(text)
-{
-if(text=="")
-{
-listeFormations().then((response) => {
-          this.setState({listeDesFormations: response.data});
+  onChangeText(text) {
+    if (text == "") {
+      listeFormations().then((response) => {
+        this.setState({ listeDesFormations: response.data });
       });
-}
-else
-{
-listeFormationsBySearchMot(text).then((response) => {
-          this.setState({listeDesFormations: response.data});
+    }
+    else {
+      listeFormationsBySearchMot(text).then((response) => {
+        this.setState({ listeDesFormations: response.data });
       });
-}
+    }
 
 
-}
+  }
 
   render() {
 
@@ -92,10 +107,10 @@ listeFormationsBySearchMot(text).then((response) => {
             <TextInput placeholder="Search" style={{
               fontSize: 20,
               marginLeft: 5
-            }} 
-            
-               onChangeText={text => this.onChangeText(text)}
-             />
+            }}
+
+              onChangeText={text => this.onChangeText(text)}
+            />
           </View>
 
         </View>
@@ -112,7 +127,7 @@ listeFormationsBySearchMot(text).then((response) => {
                 borderRadius: 50,
                 color: 'white',
                 margin: 10
-              }}>{item}</Text>}
+              }}>{item.Titre}</Text>}
 
             keyExtractor={(item, index) => index.toString()}
           />
@@ -121,19 +136,19 @@ listeFormationsBySearchMot(text).then((response) => {
 
         <ScrollView style={{ backgroundColor: 'white' }}>
           <FlatList
-      
+
             style={{ backgroundColor: this.state.searchBarFocused ? 'rgba(0,0,0,0.3)' : 'white' }}
-            data={this.state.listeDesFormations}
+            data={this.listItems}
             renderItem={({ item }) =>
 
-<View style={{flex:1,flexDirection:'row'}}>
-    <Image source={{uri:"https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg"}} style={{width:100,height:100}}/>
-    <View style={{flex:1,justifyContent:'center'}}>
-     <Text>
-     {item.titre}
-     </Text>
-    </View>
-    </View>
+              <View style={{ flex: 1, flexDirection: 'row' }}>
+                <Image source={{ uri: item.image }} style={{ width: 100, height: 100 }} />
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+                  <Text>
+                    {item.Titre}
+                  </Text>
+                </View>
+              </View>
 
 
             }
