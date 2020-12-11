@@ -13,8 +13,8 @@ const Stack = createStackNavigator();
 const Navigation = props => {
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="DetaileFormation">
-                <Stack.Screen name="DetaileFormation" component={DetaileFormation} options={{headerShown: false}} />
+            <Stack.Navigator initialRouteName="Tabs">
+                <Stack.Screen name="Tabs" component={Tabs} options={{headerShown: false}} />
                 <Stack.Screen name="Login" component={Login} options={{headerShown: false}} />
                 <Stack.Screen name="SignUp" component={SignUp} options={{headerShown: false}} />
                 <Stack.Screen name="Profile" component={Profile} options={{headerShown: false}} />
